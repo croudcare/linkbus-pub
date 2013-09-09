@@ -6,9 +6,11 @@ module Linkbus::Pub::Publisher
 
   def publish(key, message)
     Linkbus::Pub::log_info("Publishing to [ #{key} ] message [ #{message} ]")
+   
     valid_to_publish!(key, message)
     to_publish(key, message)
     return puberror.empty?
+   
     rescue StandardError => e
       Linkbus::Pub::log_fatal("Exception #{ e.message } -- #{ e.backtrace }")
       puberror.push(e)
@@ -19,13 +21,16 @@ module Linkbus::Pub::Publisher
 
   def to_publish(key, message)
     with_exchange do | topic | 
-      topic.publish(message, :routing_key => key, :mandatory => true)
+     
+      topic.publish(message, :routing_key => key, :mandatory => true, :persistent => true)
       Linkbus::Pub::log_info("Message Published  key:  [ #{key} ], message: [ #{message} ]")
+
       topic.on_return do |basic_deliver, properties, content|
         Linkbus::Pub::log_fatal("MESSAGE NOT ROUTED  [ #{key} ] message [ #{message} ]")
         puberror.push("Message not routed #{message} key: #{key}")
       end
     end
+
   end
 
   def valid_to_publish!(key, message)
