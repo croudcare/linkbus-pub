@@ -3,7 +3,7 @@ module Linkbus
     module Config
 
       class Options
-        attr_writer :host, :port, :user, :password, :bus, :vhost
+        attr_writer :host, :port, :user, :password, :bus, :vhost, :log_file
         
         def host
           @host || '127.0.0.1'
@@ -29,13 +29,18 @@ module Linkbus
           @vhost || '/'
         end
 
+        def log_file
+          @log_file || "log/linkbus.log"
+        end
+
         def to_hash
           { 
             :host => host,
             :port => port,
             :user => user,
             :password => password,
-            :vhost => vhost
+            :vhost => vhost,
+            :log_file => log_file
           }
         end
 
@@ -44,24 +49,19 @@ module Linkbus
       def self.options 
         @options ||= Options.new
       end
+      
+      def self.[](val)
+        options.send(val)
+      end
 
       def self.setup(&block)
         block.call(options)
+        Linkbus::Pub::log_info("Configured with options #{options.to_hash}")
       end
 
     end
   end
 end 
-
-
-Linkbus::Pub::Config.setup do |config| 
-  config.host = '127.0.0.1'
-  config.port = 5672
-  config.user = 'guest'
-  config.password = 'guest'
-  config.bus = 'back'
-  config.vhost = '/'
-end
 
 
 # class User
