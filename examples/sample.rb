@@ -50,5 +50,10 @@ class Medic
 
 end
 
+m = Medic.new("thiago dantas")
 
-Medic.new("thiago dantas").save
+if m.save
+    puts "Message Published"
+else
+  puts "Not Published"
+end
