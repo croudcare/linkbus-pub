@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Linkbus::Pub::VERSION
   spec.authors       = ["Thiago Dantas"]
   spec.email         = ["thiago.teixeira.dantas@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = "Linkbus publisher"
+  spec.summary       = "Linkbus publisher"
   spec.homepage      = ""
   spec.license       = "MIT"
 
