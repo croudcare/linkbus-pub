@@ -6,11 +6,11 @@ module Linkbus::Pub::Publisher
 
   def publish(key, message)
     Linkbus::Pub::log_info("Publishing to [ #{key} ] message [ #{message} ]")
-   
+
     valid_to_publish!(key, message)
     to_publish(key, message)
     return puberror.empty?
-   
+
     rescue StandardError => e
       Linkbus::Pub::log_fatal("Exception #{ e.message } -- #{ e.backtrace }")
       puberror.push(e)
@@ -20,8 +20,8 @@ module Linkbus::Pub::Publisher
   private
 
   def to_publish(key, message)
-    with_exchange do | topic | 
-     
+    with_exchange do | topic |
+
       topic.publish(message, :routing_key => key, :mandatory => true, :persistent => true)
       Linkbus::Pub::log_info("Message Published  key:  [ #{key} ], message: [ #{message} ]")
 
@@ -42,7 +42,11 @@ module Linkbus::Pub::Publisher
   end
 
   def start_bunny_client(&block)
-    client = Bunny.new(:host => Linkbus::Pub::Config.options.host, :user => Linkbus::Pub::Config.options.user, :password => Linkbus::Pub::Config.options.password, :vhost =>Linkbus::Pub::Config.options.vhost)
+    client = Bunny.new(:host => Linkbus::Pub::Config.options.host,
+                       :port => Linkbus::Pub::Config.options.port,
+                       :user => Linkbus::Pub::Config.options.user,
+                       :password => Linkbus::Pub::Config.options.password,
+                       :vhost => Linkbus::Pub::Config.options.vhost)
     client.start
     block.call(client)
     ensure
@@ -57,8 +61,8 @@ module Linkbus::Pub::Publisher
   # https://github.com/ruby-amqp/bunny/blob/master/spec/higher_level_api/integration/basic_return_spec.rb
   # sleep is how bunny spec do.
   def with_exchange(&block)
-    setup_to_publish do | client | 
-      block.call( create_topic(client) ) 
+    setup_to_publish do | client |
+      block.call( create_topic(client) )
       sleep 0.1 if puberror.empty?
     end
   end
